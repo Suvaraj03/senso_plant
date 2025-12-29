@@ -1,6 +1,6 @@
 const PlantModel = require("../models/plant.model.js");
 const DeviceModel = require("../models/device.model.js");
-const { sendShadowCommand } = require("../utils/awsShadow");
+// const { sendShadowCommand } = require("../utils/awsShadow");
 require("dotenv").config();
 
 /* ================= GEMINI HELPERS ================= */
