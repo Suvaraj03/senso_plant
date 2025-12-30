@@ -95,25 +95,24 @@
 
 // // --------------------------------------------------------------------
 // ============================================
-// 1. Load environment variables
 // ============================================
-require("dotenv").config();
-
-const express = require("express");
-const cors = require("cors");
-const connectDB = require("./config/db.js");
+// 1. Load environment variables (ESM way)
+// ============================================
+import "dotenv/config";
 
 // ============================================
-// 2. Import Routers
+// 2. Imports
 // ============================================
-const AuthRouter = require("./routes/auth.routes.js");
-const WifiRouter = require("./routes/wifi.routes.js");
-const DeviceRouter = require("./routes/device.routes.js");
-const PlantRouter = require("./routes/plant.routes.js");
-const NotificationRouter = require("./routes/notification.routes.js");
-// const AwsRouter = require("./routes/aws.routes.js"); // ✅ AWS ROUTES
-const deviceDataRoutes = require("./routes/deviceData.routes");
-// const awsRoutes = require("./routes/aws.routes");
+import express from "express";
+import cors from "cors";
+
+// Routers
+import AuthRouter from "./routes/auth.routes.js";
+import WifiRouter from "./routes/wifi.routes.js";
+import PlantRouter from "./routes/plant.routes.js";
+import NotificationRouter from "./routes/notification.routes.js";
+import deviceRoutes from "./routes/deviceRoutes.js";
+import deviceDataRoutes from "./routes/deviceData.routes.js";
 
 // ============================================
 // 3. Initialize Express App
@@ -121,12 +120,7 @@ const deviceDataRoutes = require("./routes/deviceData.routes");
 const app = express();
 
 // ============================================
-// 4. Connect to MongoDB
-// ============================================
-connectDB();
-
-// ============================================
-// 5. Global Middlewares
+// 4. Global Middlewares
 // ============================================
 
 // Required for Google OAuth popup
@@ -156,35 +150,20 @@ app.use(
 );
 
 // ============================================
-// 6. Enable MQTT Listener (IoT Real-time)
-// ============================================
-// const startMqttSubscriber = require("./mqtt/backendSubscriber");
-// require("./realtime/websocket");
-// startMqttSubscriber(); // 🔥 START ONCE
-const { startMqttSubscriber } = require("./mqtt/backendSubscriber");
-require("./realtime/websocket");
-
-startMqttSubscriber(); // 🔥 START ONCE
-
-
-// ============================================
-// 7. API Routes
+// 5. API Routes
 // ============================================
 app.use("/api/auth", AuthRouter);
 app.use("/api/wifi", WifiRouter);
-app.use("/api/device", DeviceRouter);
 app.use("/api/plant", PlantRouter);
 app.use("/api/notification", NotificationRouter);
-// app.use("/api/aws", AwsRouter); // ✅ AWS TEST ROUTES
-app.use("/api/devices", deviceDataRoutes);
-// app.use("/api/aws", awsRoutes);
-// Use only one router instance
+app.use("/api/devices", deviceRoutes);
 
-
+// IoT read APIs (telemetry + alerts)
+app.use("/api/deviceData", deviceDataRoutes);
 
 
 // ============================================
-// 8. Root Health Check
+// 6. Root Health Check
 // ============================================
 app.get("/", (req, res) => {
   res.json({
@@ -194,7 +173,7 @@ app.get("/", (req, res) => {
 });
 
 // ============================================
-// 9. Start Server (ONLY ONCE)
+// 7. Start Server (ONLY ONCE)
 // ============================================
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, "0.0.0.0", () => {
