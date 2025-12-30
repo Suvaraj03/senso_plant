@@ -113,12 +113,12 @@ import PlantRouter from "./routes/plant.routes.js";
 import NotificationRouter from "./routes/notification.routes.js";
 import deviceRoutes from "./routes/deviceRoutes.js";
 import deviceDataRoutes from "./routes/deviceData.routes.js";
-
+import connectDB from "./config/db.js";
 // ============================================
 // 3. Initialize Express App
 // ============================================
 const app = express();
-
+connectDB();
 // ============================================
 // 4. Global Middlewares
 // ============================================
